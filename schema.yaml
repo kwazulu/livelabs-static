@@ -1,0 +1,108 @@
+title: "Database Security Hands on Labs"
+stackDescription: "Deploy the DBSecLab VM instance for Database Security product labs"
+schemaVersion: 1.1.0
+version: "20200626"
+locale: "en"
+
+outputGroups:
+  - title: Database Security Build Details
+    outputs:
+      - ${notes_desc}
+
+  - title: Resources Access Information
+    outputs:
+      - ${instance_names}
+      - ${instance_public_ips}
+
+variableGroups:
+  - title: General Configuration
+    visible: false
+    variables:
+    - compartment_ocid
+    - tenancy_ocid
+    - region
+
+  - title: Required Configuration
+    visible: true
+    variables:
+    - availability_domain_name
+    - instance_image_id
+    - instance_shape
+    - ssh_public_key
+
+variables:
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    required: true
+    title: Compartment
+    description: "Compartment where you want to create the solution resources"
+
+  availability_domain_name:
+    type: oci:identity:availabilitydomain:name
+    title: "Select an availability domain"
+    required: true
+    description: "All instances will be provisioned in this availability domain"
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+
+  instance_count:
+    type: number
+    required: true
+    title: "Instance Count"
+    description: "Provide the total count of instances you would like provisioned by this stack"
+    default: 1
+
+  instance_shape:
+    type: oci:core:instanceshape:name
+    required: true
+    title: "Instance Shape"
+    description: "A shape is a template that determines the number of CPUs, amount of memory, and other resources allocated to a newly created instance."
+    default: "VM.Standard2.4"
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+
+  instance_image_id:
+    type: oci:core:image:id
+    required: true
+    title: "Instance Image OCID"
+    description: "Source custom image OCID"
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+
+  ssh_public_key:
+    type: text
+    required: true
+    title: "SSH Public Key"
+    description: "Public SSH key for accessing the compute instances over SSH"
+
+  region:
+    type: enum
+    required: true
+    title: Region
+    description: "Region where you want to deploy the resources defined by this stack"
+    default: "us-phoenix-1"
+    enum:
+      - "us-phoenix-1"
+      - "us-ashburn-1"
+      - "eu-frankfurt-1"
+      - "uk-london-1"
+      - "us-seattle-1"
+      - "r1"
+
+outputs:
+  notes_desc:
+    type: string
+    title: Notes
+    visible: true
+
+  instance_names:
+    type: list
+    title: Instances
+    displayText: Instance Display Name
+    visible: true
+
+  instance_public_ips:
+    type: list
+    title: Public IP Addresses
+    displayText: Instance Public IP Addresses
+    visible: true
